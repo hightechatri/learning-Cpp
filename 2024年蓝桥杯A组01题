@@ -1,0 +1,57 @@
+#include <iostream>
+using namespace std;
+#define ZERO 13
+int strokes(int num, bool index);
+int main()
+{
+    int month[12] = { 31,28,31,30,31,30,31,31,30,31,30,31 };
+    int t_month;
+    int year;
+    int basket = 0, cali = 0;
+    int count = 0;
+    int temp_s;
+    int i;
+    int temp;
+    for (year = 2000; year < 2024; year++)
+    {
+        if (year % 4 == 0)//考虑闰年
+            month[1] = 29;//下面计算每年的笔画数
+        else
+            month[1] = 28;
+        count += (strokes(int(year / 1000), false) + ZERO + strokes(int(year % 100 / 10), false) + strokes(year % 10, false));//确计算前四位数 
+        temp_s = count;
+        for (t_month = 0; t_month <= 11; t_month++)
+        {
+            count += strokes(t_month+1, true);//月份对笔画数的影响，考虑“01”中的0
+            temp = count;//防止前六位数字笔画和丢失        
+            for (i = 1; i <= month[t_month]; i++)
+            {
+                count += strokes(i, true);//count增加后两位，考虑“0”
+                if (count > 50)
+                    basket++;
+                else
+                    cali++;
+                count = temp;//count回到前六位和
+            }
+            count = temp_s;//count回到前四位和 
+        }
+        count = 0;//count清零 
+    }
+    cout << "篮球次数：" << basket+43 << endl//通过另外的程序单独计算2024年总共43次篮球
+        << "书法次数：" << cali+61;//同上
+  
+    return 0;
+}
+int strokes(int num, bool index)//当index为真则考虑“0”
+{
+    int chr[10] = { 13,1,2,3,5,4,4,2,2,2 };
+    if (num < 10)
+    {
+        if (index == 0)
+            return chr[num];
+        else
+            return ZERO + chr[num];
+    }
+    else
+        return strokes(int(num / 10), false) + strokes(num % 10, false);
+}
